@@ -21,7 +21,7 @@ export async function getCart(req,res){
         const {idUser} = await db.collection("sessions").findOne({token})
         const {email} = await db.collection("users").findOne({_id:idUser})
         const list = await db.collection("cart").find({email}).toArray()
-        res.status(302).send(list)
+        res.status(200).send(list)
     } catch ({message}) {
         res.status(500).send(message)
     }
