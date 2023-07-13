@@ -21,9 +21,20 @@ export const postProduct = async (req, res) => {
 };
 
 export const getProducts = async (req, res) => {
+  const { category } = req.query;
   try {
-    const products = await db.collection('products').find().toArray();
-    res.send(products);
+    if (category) {
+      const filteredProducts = await db.collection('products').find(
+        { $or: [
+          { title: { $regex: category, $options: 'i' } },
+          { description: { $regex: category, $options: 'i' } }
+        ]}
+      ).toArray();
+      res.send(filteredProducts);
+    } else {
+      const products = await db.collection('products').find().toArray();
+      res.send(products);
+    }
   } catch ({ message }) {
     res.status(500).send(message);
   }
