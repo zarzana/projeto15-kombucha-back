@@ -29,8 +29,6 @@ export const getProducts = async (req, res) => {
   }
 };
 
-//usada para reduzir a quantidade do stock de um produto especifico
-//OBS: será chamada quando um produto é adicionado/aumentado, reduzido no carrinho e após uma compra ser feita(checkout)
 export const changeStock = async (req, res) => {
   const { id } = req.params;
   const value = Number(req.params.value);
