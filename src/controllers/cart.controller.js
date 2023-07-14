@@ -13,7 +13,7 @@ export async function postCart(req,res){
         const {idUser} = await db.collection("sessions").findOne({token});
         if (!idUser) return res.status(404).send('session not found');
 
-        await db.collection("cart").insertOne({...prod,idUser});
+        await db.collection("cart").insertOne({...prod,idUser,qtd:1});
         res.sendStatus(201);
     } catch ({message}) {
         res.status(500).send(message);
