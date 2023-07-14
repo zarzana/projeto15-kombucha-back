@@ -21,7 +21,7 @@ export const postProduct = async (req, res) => {
 };
 
 export const getProducts = async (req, res) => {
-  const { category } = req.query;
+  const { category, page, qtd } = req.query;
   try {
     if (category) {
       const filteredProducts = await db.collection('products').find(
@@ -31,9 +31,18 @@ export const getProducts = async (req, res) => {
         ]}
       ).toArray();
       res.send(filteredProducts);
+
+    } else if (page) {
+      const paginationProducts = await db.collection('products').find()
+      .skip((Number(page) - 1) * Number(qtd))
+      .limit(!qtd ? 0 : Number(qtd))
+      .toArray();
+      res.send(paginationProducts);
+
     } else {
       const products = await db.collection('products').find().toArray();
       res.send(products);
+      
     }
   } catch ({ message }) {
     res.status(500).send(message);
