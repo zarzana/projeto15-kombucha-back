@@ -23,25 +23,45 @@ export const postProduct = async (req, res) => {
 export const getProducts = async (req, res) => {
   const { category, page, qtd } = req.query;
   try {
+    let count = await db.collection('products').countDocuments();
     if (category) {
-      const filteredProducts = await db.collection('products').find(
+      let filteredProducts;
+      count = await db.collection('products').countDocuments(
         { $or: [
           { title: { $regex: category, $options: 'i' } },
           { description: { $regex: category, $options: 'i' } }
         ]}
-      ).toArray();
-      res.send(filteredProducts);
-
+      );
+      if (page) {
+        filteredProducts = await db.collection('products').find(
+          { $or: [
+            { title: { $regex: category, $options: 'i' } },
+            { description: { $regex: category, $options: 'i' } }
+          ]}
+        )
+        .skip((Number(page) - 1) * Number(qtd))
+        .limit(!qtd ? 0 : Number(qtd))
+        .toArray();
+      } else {
+        filteredProducts = await db.collection('products').find(
+          { $or: [
+            { title: { $regex: category, $options: 'i' } },
+            { description: { $regex: category, $options: 'i' } }
+          ]}
+        ).toArray();
+      }
+      res.send({productsData: filteredProducts, count});
+      
     } else if (page) {
       const paginationProducts = await db.collection('products').find()
       .skip((Number(page) - 1) * Number(qtd))
       .limit(!qtd ? 0 : Number(qtd))
       .toArray();
-      res.send(paginationProducts);
+      res.send({productsData: paginationProducts, count});
 
     } else {
-      const products = await db.collection('products').find().toArray();
-      res.send(products);
+      const productsData = await db.collection('products').find().toArray();
+      res.send({productsData, count});
       
     }
   } catch ({ message }) {
